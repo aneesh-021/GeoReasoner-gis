@@ -1,0 +1,37 @@
+# build_faiss_index.py
+import json
+import numpy as np
+import faiss
+import os
+from sentence_transformers import SentenceTransformer
+
+# === Load your chunks ===
+with open("data/chunks.jsonl") as f:
+    chunks = [json.loads(line) for line in f if line.strip()]
+
+# Create a mapping of tool -> chunk
+texts = []
+ids = []
+
+for chunk in chunks:
+    if "usage" in chunk and "tool" in chunk:
+        texts.append(chunk["usage"])
+        ids.append(chunk["tool"])
+
+# === Generate embeddings ===
+model = SentenceTransformer('all-MiniLM-L6-v2')
+embeddings = model.encode(texts)
+embeddings = np.array(embeddings).astype("float32")
+
+# === Create FAISS index ===
+index = faiss.IndexFlatL2(embeddings.shape[1])
+index.add(embeddings)
+
+# === Save to vector_db/ ===
+os.makedirs("vector_db", exist_ok=True)
+faiss.write_index(index, "vector_db/rag_faiss.index")
+
+with open("vector_db/rag_metadata.json", "w") as f:
+    json.dump(ids, f)
+
+print("✅ FAISS index successfully built at vector_db/rag_faiss.index")

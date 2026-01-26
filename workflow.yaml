@@ -1,0 +1,18 @@
+steps:
+- command: read_file
+  output: z_gdf
+  params:
+    filepath: data/input/urban_zoning.shp
+  tool: geopandas
+- command: filter
+  output: res_gdf
+  params:
+    gdf: z_gdf
+    where: zone == 'Residential'
+  tool: geopandas
+- command: calculate
+  output: final_res
+  params:
+    expression: area
+    gdf: res_gdf
+  tool: geopandas

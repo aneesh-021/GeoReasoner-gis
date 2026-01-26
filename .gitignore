@@ -1,0 +1,16 @@
+
+node_modules/
+venv/
+.venv/
+.env
+*.zip
+*.tar
+*.tgz
+*.gz
+*.bin
+bin/
+*.model
+data/
+datasets/
+__pycache__/
+*.log
